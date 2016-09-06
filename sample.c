@@ -3,16 +3,16 @@
 
 int main(void)
 {
-	char errbuf[256];
-	char *network_interface = pcap_lookupdev(errbuf);
-	if (network_interface != NULL)
+	char errbuf[PCAP_ERRBUF_SIZE];
+	pcap_if_t *pcap_ift_ptr = NULL;
+	int ret = pcap_findalldevs(&pcap_ift_ptr, errbuf);
+	if (ret == -1)
 	{
-		printf("\nNETWORK INTERFACE NAME: %s", network_interface);
+		printf("\n[ERROR] pcap_findalldevs failed: %s\n", errbuf);
+		return 1;
 	}
-	else
-	{
-		printf("\n[ERR] pcap_lookupdev failed: error: %s", errbuf);
-	}
+	else if (ret == 0)	// 0 devices found, unlikely case, and success also. Same case
+		print_all_devs(pcap_ift_ptr);
 	printf("\n");
 	return 0;
 }
