@@ -6,7 +6,7 @@
 void print_all_devs(pcap_if_t *ptr)
 {
 	if (ptr == NULL)
-		printf("\nNo devices found ");
+		printf("\nNo devices found");
 	else
 	{
 		printf("\n\t\t%-15s%10c%-10s","NAME", ' ', "DESCRIPTION");
@@ -18,4 +18,17 @@ void print_all_devs(pcap_if_t *ptr)
 		} while (ptr != NULL);
 	}
 	printf("\n");
+}
+
+void mypcapcallback(u_char *user, const struct pcap_pkthdr *h, const u_char *packet)
+{
+	static int i;
+//	printf("\n%*c", 50, '#');
+//	printf("\n%s%10c%5s%10c%5s%10c%10s", "SRNO", ' ', "CAPLEN", ' ', "LEN", ' ', "PAYLOAD");
+//	printf("\n%4d%10c%5d%10c%5d%10c%10s", ++i, ' ', h->caplen, ' ',h->len, ' ', packet);
+//	printf("\n%*c", 50, '#');
+	printf("\n#####################################################################################################");
+	printf("\nSRNO: %d\nPACKET CAP LENGTH: %3d\nPACKET LENGTH (OFF WIRE): %3d\nPACKET PAYLOAD: %3s", ++i, h->caplen,h->len, packet);
+	printf("\n#####################################################################################################\n");
+//	printf("%X %X ", h->caplen, h->len);
 }
