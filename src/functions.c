@@ -1,3 +1,9 @@
+/**************************************************
+*   FILE : src/functions.c
+* AUTHOR : Siddharth Manoj Bhise
+*   DATE : 7th-September-2016
+* Signature inserted by "identity_inserter" 
+**************************************************/
 #include <stdio.h>
 #include <pcap.h>
 #include <arpa/inet.h>	// for functions like ntohs etc.
