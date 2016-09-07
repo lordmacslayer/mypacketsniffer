@@ -7,6 +7,7 @@
 #include <pcap.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define PREP_TCP_UDP_FILTER(FILTER_STR, BPF_INT32_HOST) sprintf(FILTER_STR, "tcp udp host %d", BPF_INT32_HOST)
 #define TCP_UDP_FILTER "tcp || udp"

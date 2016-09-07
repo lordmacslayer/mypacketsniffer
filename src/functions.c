@@ -16,7 +16,32 @@ void parse_packets(u_char *user, const struct pcap_pkthdr *h, const u_char *pack
 	struct ether_header *eth_header = NULL;
 
 	eth_header = (struct ether_header *) packet;
-	printf("\nEthernet header type = %x", ntohs(eth_header->ether_type));
+//	printf("\nEthernet header type = %x", ntohs(eth_header->ether_type));
+	switch (ntohs(eth_header->ether_type))
+	{
+		case ETHERTYPE_PUP: // 0x0200
+			break;
+		case ETHERTYPE_IP: // 0x0800
+			process_ip_4(packet, eth_header);
+			break;
+		case ETHERTYPE_ARP: // 0x0806
+			break;
+		case ETHERTYPE_REVARP: // 0x8036
+			break;
+		case ETHERTYPE_VLAN: // 0x8100
+			break;
+		case ETHERTYPE_IPV6: // 0x86dd
+			break;
+		case ETHERTYPE_PAE: // 0x888e
+			break;
+		case ETHERTYPE_RSN_PREAUTH: // 0x88c7
+			break;
+		case ETHERTYPE_LOOPBACK: // 0x9000
+			break;
+		default:
+			printf("\nEthernet header type = N/A");
+			break;
+	}
 }
 
 
@@ -47,6 +72,8 @@ void mypcapcallback(u_char *user, const struct pcap_pkthdr *h, const u_char *pac
 //	printf("\n%4d%10c%5d%10c%5d%10c%10s", ++i, ' ', h->caplen, ' ',h->len, ' ', packet);
 //	printf("\n%*c", 50, '#');
 	printf("\n#####################################################################################################");
+	printf("\n%20s", "ETHERNET");
+	printf("\n%20s", "--------");
 	printf("\nSRNO: %d\nPACKET CAP LENGTH: %3d\nPACKET LENGTH (OFF WIRE): %3d\nPACKET PAYLOAD: %3s", ++i, h->caplen,h->len, packet);
 	parse_packets(user, h, packet);
 	printf("\n#####################################################################################################\n");
