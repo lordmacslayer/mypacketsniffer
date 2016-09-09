@@ -1,9 +1,0 @@
-Capturing packets means collecting data being transmitted on the network. Every time a network card receives an Ethernet frame, it checks if its destination MAC address matches its own. If it does, it generates an interrupt request. The routine that handles this interrupt is the network card’s driver; it copies the data from the card buffer to kernel space, then checks the ethertype field of the Ethernet header to determine the type of the packet, and passes it to the appropriate handler in the protocol stack. The data is passed up the layers until it reaches the user-space application, which consumes it.
-
-When we are sniffing packets, the network driver also sends a copy of each received packet to the packet filter. To sniff packets, we will use libpcap, an open source library.
-
-
-GUIDELINES TO WRITE A PACKET SNIFFING PROGRAM:
----------------------------------------------
-
-

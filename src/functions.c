@@ -32,10 +32,12 @@ void parse_packets(u_char *user, const struct pcap_pkthdr *h, const u_char *pack
 			break;
 		case ETHERTYPE_IPV6: // 0x86dd
 			break;
+#ifdef __APPLE__ && __MACH__
 		case ETHERTYPE_PAE: // 0x888e
 			break;
 		case ETHERTYPE_RSN_PREAUTH: // 0x88c7
 			break;
+#endif
 		case ETHERTYPE_LOOPBACK: // 0x9000
 			break;
 		default:
@@ -74,7 +76,7 @@ void mypcapcallback(u_char *user, const struct pcap_pkthdr *h, const u_char *pac
 	printf("\n#####################################################################################################");
 	printf("\n%20s", "ETHERNET");
 	printf("\n%20s", "--------");
-	printf("\nSRNO: %d\nPACKET CAP LENGTH: %3d\nPACKET LENGTH (OFF WIRE): %3d\nPACKET PAYLOAD: %3s", ++i, h->caplen,h->len, packet);
+	printf("\nSRNO: %d\nPACKET CAP LENGTH: %3d\nPACKET LENGTH (OFF WIRE): %3d", ++i, h->caplen,h->len);
 	parse_packets(user, h, packet);
 	printf("\n#####################################################################################################\n");
 //	printf("%X %X ", h->caplen, h->len);
