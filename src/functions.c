@@ -16,7 +16,8 @@ void parse_packets(u_char *user, const struct pcap_pkthdr *h, const u_char *pack
 	struct ether_header *eth_header = NULL;
 
 	eth_header = (struct ether_header *) packet;
-//	printf("\nEthernet header type = %x", ntohs(eth_header->ether_type));
+	printf("\n%20s", "ETHERNET");
+	printf("\n%20s", "--------");
 	switch (ntohs(eth_header->ether_type))
 	{
 		case ETHERTYPE_PUP: // 0x0200
@@ -37,11 +38,14 @@ void parse_packets(u_char *user, const struct pcap_pkthdr *h, const u_char *pack
 			break;
 		case ETHERTYPE_RSN_PREAUTH: // 0x88c7
 			break;
+		case 0x4006:	// don't know why but on Mac, lo0 interface, this is what I receive
+		case 0x4003: // not sure how to handle this. Will have to read more.
+			break;
 #endif
 		case ETHERTYPE_LOOPBACK: // 0x9000
 			break;
 		default:
-			printf("\nEthernet header type = N/A");
+			printf("\nEthernet header type = N/A (0x%x)", ntohs(eth_header->ether_type));
 			break;
 	}
 }
@@ -69,15 +73,19 @@ void print_all_devs(pcap_if_t *ptr)
 void mypcapcallback(u_char *user, const struct pcap_pkthdr *h, const u_char *packet)
 {
 	static int i;
-//	printf("\n%*c", 50, '#');
-//	printf("\n%s%10c%5s%10c%5s%10c%10s", "SRNO", ' ', "CAPLEN", ' ', "LEN", ' ', "PAYLOAD");
-//	printf("\n%4d%10c%5d%10c%5d%10c%10s", ++i, ' ', h->caplen, ' ',h->len, ' ', packet);
-//	printf("\n%*c", 50, '#');
 	printf("\n#####################################################################################################");
-	printf("\n%20s", "ETHERNET");
-	printf("\n%20s", "--------");
-	printf("\nSRNO: %d\nPACKET CAP LENGTH: %3d\nPACKET LENGTH (OFF WIRE): %3d", ++i, h->caplen,h->len);
-	parse_packets(user, h, packet);
+	if (h->caplen < ETHER_MIN_LEN)
+	{
+		// caplen is the captured length.
+		// len is the total length.
+		printf("\nFrame too short to process. Captured length = %d, min = %d", h->caplen, ETHER_MIN_LEN);
+	}
+	else
+	{
+		printf("\n%20s", "LAYER 1");
+		printf("\n%20s", "----- -");
+		printf("\nSRNO: %d\nPACKET CAP LENGTH: %3d\nPACKET LENGTH (OFF WIRE): %3d", ++i, h->caplen,h->len);
+		parse_packets(user, h, packet);
+	}
 	printf("\n#####################################################################################################\n");
-//	printf("%X %X ", h->caplen, h->len);
 }

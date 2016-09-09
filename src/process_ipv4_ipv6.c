@@ -10,8 +10,10 @@
 #include <netinet/ip.h>
 #include <netinet/ip6.h>
 
+extern void process_tcp(const u_char *, struct ether_header *);
 void process_ip_4(const u_char *packet, struct ether_header *eth_header)
 {
+	char source_ip[256], dest_ip[256];
 	struct ip *ip_packet = (struct ip *) (packet + sizeof(struct ether_header));
 	printf("\n%20s", "NETWORK LAYER");
 	printf("\n%20s", "------- -----");
@@ -64,7 +66,7 @@ void process_ip_4(const u_char *packet, struct ether_header *eth_header)
 	// A checksum on the header only.  Since some header fields change
 	// (e.g., time to live), this is recomputed and verified at each point
 	// that the internet header is processed.
-	printf("\nIP Source: %s\tDest: %s", inet_ntoa(ip_packet->ip_src), inet_ntoa(ip_packet->ip_dst));
+	printf("\nIP Source: %s\tDest: %s", inet_ntop(AF_INET, &ip_packet->ip_src, source_ip, 256), inet_ntop(AF_INET, &ip_packet->ip_dst, dest_ip, 256));
 
 	// NOTE ON CHECKSUM ALGORITHM
 	/*
@@ -78,4 +80,14 @@ void process_ip_4(const u_char *packet, struct ether_header *eth_header)
 		 indicates it is adequate, but it is provisional and may be replaced
 		 by a CRC procedure, depending on further experience.
 	 */
+
+	// Now we are ready to parse the next level protocol structure
+	switch (ip_packet->ip_p)
+	{
+		case 6:  // TCP
+			process_tcp(packet, eth_header);
+			break;
+		case 17: // UDP
+			break;
+	}
 }
