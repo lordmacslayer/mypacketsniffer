@@ -11,6 +11,7 @@
 
 #define PREP_TCP_UDP_FILTER(FILTER_STR, BPF_INT32_HOST) sprintf(FILTER_STR, "tcp udp host %d", BPF_INT32_HOST)
 #define TCP_UDP_FILTER "tcp || udp"
+#define UDP_FILTER "udp"
 
 extern void mypcapcallback(u_char *, const struct pcap_pkthdr, const u_char *);
 extern void print_all_devs(pcap_if_t *);
@@ -71,7 +72,8 @@ int main(void)
 
 		memset(errbuf, 0, PCAP_ERRBUF_SIZE);
 		// set up the filter to capture, say tcp and udp traffic arriving at and going from this host Siddharths-Mac-mini.local
-		if (pcap_compile(pcap_t_ptr, &bpf_prog_fp, TCP_UDP_FILTER, 0, netmaskaddr) == -1)
+	//	if (pcap_compile(pcap_t_ptr, &bpf_prog_fp, TCP_UDP_FILTER, 0, netmaskaddr) == -1)
+		if (pcap_compile(pcap_t_ptr, &bpf_prog_fp, UDP_FILTER, 0, netmaskaddr) == -1)
 		{
 			printf("\n[ERROR] pacp_compile: %s\n", pcap_geterr(pcap_t_ptr));
 			return 1;

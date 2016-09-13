@@ -11,6 +11,7 @@
 #include <netinet/ip6.h>
 
 extern void process_tcp(const u_char *, struct ether_header *);
+extern void process_udp(const u_char *, struct ip *, unsigned int);
 void process_ip_4(const u_char *packet, struct ether_header *eth_header)
 {
 	char source_ip[256], dest_ip[256];
@@ -22,7 +23,7 @@ void process_ip_4(const u_char *packet, struct ether_header *eth_header)
 	// Internet Header Length is the length of the internet header in 32
 	// bit words, and thus points to the beginning of the data.  Note that
 	// the minimum value for a correct header is 5.
-	printf("\nIP Header Length: %u", ip_packet->ip_hl);
+	printf("\nIP Header Length: %u in header and total %u bytes", ip_packet->ip_hl, ip_packet->ip_hl*4);
 	// ip_tos: RFC 791
 	// The Type of Service provides an indication of the abstract
 	// parameters of the quality of service desired.  These parameters are
@@ -85,9 +86,10 @@ void process_ip_4(const u_char *packet, struct ether_header *eth_header)
 	switch (ip_packet->ip_p)
 	{
 		case 6:  // TCP
-			process_tcp(packet, eth_header);
+	//		process_tcp(packet, eth_header);
 			break;
 		case 17: // UDP
+			process_udp(packet, ip_packet, ip_packet->ip_hl*4);
 			break;
 	}
 }

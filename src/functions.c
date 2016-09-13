@@ -13,6 +13,8 @@
 
 void parse_packets(u_char *user, const struct pcap_pkthdr *h, const u_char *packet)
 {
+	// TODO:
+	// Use the ETHER_IS_VALID_LEN in net/ethernet.h to validate length of the ethernet packet
 	struct ether_header *eth_header = NULL;
 
 	eth_header = (struct ether_header *) packet;
@@ -73,19 +75,17 @@ void print_all_devs(pcap_if_t *ptr)
 void mypcapcallback(u_char *user, const struct pcap_pkthdr *h, const u_char *packet)
 {
 	static int i;
-	printf("\n#####################################################################################################");
 	if (h->caplen < ETHER_MIN_LEN)
 	{
 		// caplen is the captured length.
 		// len is the total length.
-		printf("\nFrame too short to process. Captured length = %d, min = %d", h->caplen, ETHER_MIN_LEN);
+	//	printf("\nFrame too short to process. Captured length = %d, min = %d", h->caplen, ETHER_MIN_LEN);
+		return;
 	}
-	else
-	{
-		printf("\n%20s", "LAYER 1");
-		printf("\n%20s", "----- -");
-		printf("\nSRNO: %d\nPACKET CAP LENGTH: %3d\nPACKET LENGTH (OFF WIRE): %3d", ++i, h->caplen,h->len);
+	printf("\n#####################################################################################################");
+		printf("\n%20s", "FRAME");
+		printf("\n%20s", "-----");
+		printf("\nSrno: %d\nFrame Cap Length: %3d\nFrame Length (Off Wire): %3d", ++i, h->caplen,h->len);
 		parse_packets(user, h, packet);
-	}
 	printf("\n#####################################################################################################\n");
 }
