@@ -8,18 +8,39 @@
 #include <pcap.h>
 #include <arpa/inet.h>	// for functions like ntohs etc.
 #include <net/ethernet.h>
+#include <pthread.h>
+#include <stdlib.h>
 
-// this is just a temporary function for studying how to analyze/parse the captured packets
+#ifndef __APPLE__ && __MACH__
+#include <malloc.h>
+#endif
 
-void parse_packets(u_char *user, const struct pcap_pkthdr *h, const u_char *packet)
+#include "mps.h"
+
+pthread_mutex_t print_mutex = PTHREAD_MUTEX_INITIALIZER;
+//void parse_packets(u_char *user, const struct pcap_pkthdr *h, const u_char *packet)
+void parse_packets(void *p)
 {
-	// TODO:
 	// Use the ETHER_IS_VALID_LEN in net/ethernet.h to validate length of the ethernet packet
 	struct ether_header *eth_header = NULL;
+	PACKET_THREAD *pt = (PACKET_THREAD *) p;
+	u_char *user = pt->user;
+	const struct pcap_pkthdr *h = pt->h;
+	const u_char *packet = pt->packet;
+	pthread_t my_thread_id = pt->thread_id;
+	unsigned int packet_no = pt->packet_no;
+
+	// acquire lock
+	pthread_mutex_lock(&print_mutex);
+	printf("\n#####################################################################################################");
+		printf("\n%20s", "FRAME");
+		printf("\n%20s", "-----");
+		printf("\nSrno: %d\nFrame Cap Length: %3d\nFrame Length (Off Wire): %3d", packet_no, h->caplen,h->len);
 
 	eth_header = (struct ether_header *) packet;
 	printf("\n%20s", "ETHERNET");
 	printf("\n%20s", "--------");
+	printf("\nETHERNET ether_type = 0x%X", ntohs(eth_header->ether_type));
 	switch (ntohs(eth_header->ether_type))
 	{
 		case ETHERTYPE_PUP: // 0x0200
@@ -47,9 +68,12 @@ void parse_packets(u_char *user, const struct pcap_pkthdr *h, const u_char *pack
 		case ETHERTYPE_LOOPBACK: // 0x9000
 			break;
 		default:
-			printf("\nEthernet header type = N/A (0x%x)", ntohs(eth_header->ether_type));
+			// yet to handle
 			break;
 	}
+	printf("\n#####################################################################################################\n");
+	// release lock
+	pthread_mutex_unlock(&print_mutex);
 }
 
 
@@ -75,6 +99,8 @@ void print_all_devs(pcap_if_t *ptr)
 void mypcapcallback(u_char *user, const struct pcap_pkthdr *h, const u_char *packet)
 {
 	static int i;
+	pthread_t thread_id;
+	PACKET_THREAD *packet_holder = NULL;
 	if (h->caplen < ETHER_MIN_LEN)
 	{
 		// caplen is the captured length.
@@ -82,10 +108,19 @@ void mypcapcallback(u_char *user, const struct pcap_pkthdr *h, const u_char *pac
 	//	printf("\nFrame too short to process. Captured length = %d, min = %d", h->caplen, ETHER_MIN_LEN);
 		return;
 	}
-	printf("\n#####################################################################################################");
-		printf("\n%20s", "FRAME");
-		printf("\n%20s", "-----");
-		printf("\nSrno: %d\nFrame Cap Length: %3d\nFrame Length (Off Wire): %3d", ++i, h->caplen,h->len);
-		parse_packets(user, h, packet);
-	printf("\n#####################################################################################################\n");
+	packet_holder = (PACKET_THREAD *) malloc(sizeof(PACKET_THREAD));
+	if (packet_holder == NULL)
+	{
+		fprintf(stderr, "\nFailed to allocate memory for packet holder\n");
+		exit(1);
+	}
+
+	packet_holder->user = user;
+	packet_holder->h = h;
+	packet_holder->packet = packet;
+	packet_holder->thread_id = thread_id;
+	packet_holder->packet_no = ++i;
+
+	pthread_create(&thread_id, NULL, (void *) parse_packets, (void *) packet_holder);
 }
+

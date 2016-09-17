@@ -57,7 +57,8 @@ void process_udp(const u_char *packet, struct ip *ip_packet, unsigned int ip_hea
 		insert_new_line = (insert_new_line + 1) % 8;
 	}
 	// this while loop is to dump the ascii for the last line hex dump
-	printf("%*c",23-insert_new_line-(insert_new_line - 1),' ');
+	if ((insert_new_line - 1) % 8 != 0)
+		printf("%*c",23-insert_new_line-(insert_new_line - 1),' ');
 	printf("\t\t");
 	while (dump_ascii != payload_ptr)
 	{

@@ -44,7 +44,7 @@ int main(void)
 		memset(errbuf, 0, PCAP_ERRBUF_SIZE);
 		memset(dev_name, 0, 256);
 		// ask the user for the name of the interface
-		printf("\nEnter the name of the device you wish to capture for packets (with correct spelling): ");
+		printf("\nEnter the name of the device you wish to capture for packets (spelled correctly): ");
 		scanf("%s", dev_name);
 		
 		// opening in promiscuous mode
@@ -84,7 +84,13 @@ int main(void)
 			printf("\n[ERROR] pcap_setfilter: %s\n", pcap_geterr(pcap_t_ptr));
 			return 1;
 		}
-
+		
+		// The program can be multi-threaded from here...
+		/*
+			 * Let the main thread worry only about dispatching since it has nothing more to do.
+			 * For every call to the callback, the latter should create a thread for parsing its packet. 
+			 * So the multi-threading should be done in mypcapcallback.
+		*/
 		while (1)
 		{
 			ret = pcap_dispatch(pcap_t_ptr, -1, mypcapcallback, NULL);		
