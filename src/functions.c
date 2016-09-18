@@ -11,14 +11,13 @@
 #include <pthread.h>
 #include <stdlib.h>
 
-#ifndef __APPLE__ && __MACH__
+#ifndef __APPLE__ && __MACH__		// malloc function on Mac OS X is declared in the file stdlib.h and not in malloc.h
 #include <malloc.h>
 #endif
 
 #include "mps.h"
 
 pthread_mutex_t print_mutex = PTHREAD_MUTEX_INITIALIZER;
-//void parse_packets(u_char *user, const struct pcap_pkthdr *h, const u_char *packet)
 void parse_packets(void *p)
 {
 	// Use the ETHER_IS_VALID_LEN in net/ethernet.h to validate length of the ethernet packet
