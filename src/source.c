@@ -68,7 +68,16 @@ int main(void)
 
 
 		system("clear");
-		printf("%20s: %10s (ipv4: %d.%d.%d.%d\tnetmaskaddr: %d.%d.%d.%d)\n\n","OPENING DEVICE FOR CAPTURE", dev_name, *u_char_print_ip, *(u_char_print_ip+1), *(u_char_print_ip+2), *(u_char_print_ip+3), *u_char_print_netmask, *(u_char_print_netmask+1), *(u_char_print_netmask+2), *(u_char_print_netmask+3));
+		printf("%20s: %10s (ipv4: %d.%d.%d.%d\tnetmaskaddr: %d.%d.%d.%d)\n\n","OPENING DEVICE FOR CAPTURE", 
+				dev_name, 
+				*u_char_print_ip, 
+				*(u_char_print_ip+1), 
+				*(u_char_print_ip+2), 
+				*(u_char_print_ip+3), 
+				*u_char_print_netmask, 
+				*(u_char_print_netmask+1), 
+				*(u_char_print_netmask+2), 
+				*(u_char_print_netmask+3));
 
 		memset(errbuf, 0, PCAP_ERRBUF_SIZE);
 		// set up the filter to capture, say tcp and udp traffic arriving at and going from this host Siddharths-Mac-mini.local

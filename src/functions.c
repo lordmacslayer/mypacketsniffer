@@ -73,6 +73,7 @@ void parse_packets(void *p)
 	printf("\n#####################################################################################################\n");
 	// release lock
 	pthread_mutex_unlock(&print_mutex);
+	free (p);
 }
 
 
